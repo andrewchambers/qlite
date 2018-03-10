@@ -5,6 +5,8 @@ Concurrent write access is safe, but aquires a lock, qlite will wait at most 5 s
 
 Will exit with code 111 if get is called on an empty queue.
 
+The default database is ./qlite.db
+
 
 ```
 usage: qlite [-h] [--db DB] {get,ack,size,put} ...
