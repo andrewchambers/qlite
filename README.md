@@ -51,8 +51,10 @@ usage: qlite ack [-h]
 
 optional arguments:
   -h, --help  show this help message and exit
+```
 
-[ac@nixos:~/src/qlite]$ ./qlite size --help
+```
+$ ./qlite size --help
 usage: qlite size [-h] [-n]
 
 optional arguments:
