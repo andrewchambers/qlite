@@ -15,24 +15,27 @@ size_parser = subparser.add_parser('size')
 size_parser.add_argument('-n', action='store_true', help='don\'t print a new line after the value')
 put_parser = subparser.add_parser('put')
 put_parser.add_argument('-f', action='store_true', help='read the file at path put_value as the value')
+put_parser.add_argument('-p', default=0, type=int, help='value priority, can be used to build priority a queue, defaults to 0')
 put_parser.add_argument('put_value')
 
 args = vars(parser.parse_args())
 
 conn = sqlite3.connect(args['db'])
 c = conn.cursor()
-c.execute("CREATE TABLE IF NOT EXISTS Data (Id INTEGER PRIMARY KEY AUTOINCREMENT, Value TEXT);")
+c.execute("CREATE TABLE IF NOT EXISTS Data (Id INTEGER PRIMARY KEY AUTOINCREMENT, Priority INTEGER, Value TEXT);")
+c.execute("CREATE INDEX IF NOT EXISTS PriorityIndex ON Data (Priority);")
 
 rc = 0
 
 if args['sub'] == 'put':
+    print(args)
     value = args["put_value"]
     if args['f']:
         with open(value) as f:
             value = f.read()
-    c.execute("INSERT INTO Data(Value) VALUES (?);", (value,))
+    c.execute("INSERT INTO Data(Priority, Value) VALUES (?, ?);", (args['p'], value,))
 elif args['sub'] == 'get':
-    c.execute("SELECT Id, Value FROM Data ORDER BY Id LIMIT 1;")
+    c.execute("SELECT Id, Value FROM Data ORDER BY Priority DESC, Id LIMIT 1;")
     r = c.fetchone()
     if r is not None:
         sys.stdout.write(r[1])
@@ -43,7 +46,7 @@ elif args['sub'] == 'get':
     else:
         rc = 111
 elif args['sub'] == 'ack':
-    c.execute("SELECT Id FROM Data ORDER BY Id LIMIT 1;")
+    c.execute("SELECT Id FROM Data ORDER BY Priority DESC, Id LIMIT 1;")
     r = c.fetchone()
     if r is not None:
         c.execute("DELETE FROM Data WHERE Id = ?;", r)
