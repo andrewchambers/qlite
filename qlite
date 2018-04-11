@@ -28,7 +28,6 @@ c.execute("CREATE INDEX IF NOT EXISTS PriorityIndex ON Data (Priority);")
 rc = 0
 
 if args['sub'] == 'put':
-    print(args)
     value = args["put_value"]
     if args['f']:
         with open(value) as f:
